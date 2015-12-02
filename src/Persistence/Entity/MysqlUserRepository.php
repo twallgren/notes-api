@@ -8,51 +8,97 @@
 
 namespace Notes\Persistence\Entity;
 
-
 use Notes\Domain\Entity\User;
 use Notes\Domain\Entity\UserRepositoryInterface;
 use Notes\Domain\ValueObject\Uuid;
 
 class MysqlUserRepository implements  UserRepositoryInterface
 {
-    protected $adapter;
-    public function __construct(PdoAdapter $adapter)
+    protected $connection;
+    public function __construct()
     {
-        $this->adapter = $adapter;
+        $this->connection = mysqli_connect("localhost","taylor","password","testdb");
     }
 
     public function add(User $user)
     {
-        // TODO: Implement add() method.
+        mysqli_query($this->connection,"INSERT INTO `test_user`(`id`, `username`, `firstName`, ".
+            "`lastName`) VALUES ('".$user->getId()."','".$user->getUsername()."','".$user->getFirstName()."','".$user->getLastName()."');");
     }
 
     public function getUsers()
     {
-        // TODO: Implement getUsers() method.
+        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `test_user`;");
+        $users=[];
+        while($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
+        {
+            $user = new User($row['id']);
+            $user->setUsername($row['username']);
+            $user->setFirstName($row['firstName']);
+            $user->setLastName($row['lastName']);
+            $users[]=$user;
+            unset($user);
+        }
+        return $users;
     }
 
     public function getByUsername($username)
     {
-        // TODO: Implement getByUsername() method.
+        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` ".
+            "FROM `test_user` WHERE `username` = '".$username."';");
+        print_r("SELECT `id`, `username`, `firstName`, `lastName` ".
+            "FROM `test_user` WHERE `username` = '".$username."';");
+        if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
+        {
+            $user = new User($row['id']);
+            $user->setUsername($row['username']);
+            $user->setFirstName($row['firstName']);
+            $user->setLastName($row['lastName']);
+            return $user;
+        }
+        return false;
     }
 
     public function getById(Uuid $id)
     {
-        // TODO: Implement getById() method.
+        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `test_user` WHERE `id` = '$id';");
+        if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
+        {
+            $user = new User($row['id']);
+            $user->setUsername($row['username']);
+            $user->setFirstName($row['firstName']);
+            $user->setLastName($row['lastName']);
+            return $user;
+        }
+        return false;
     }
 
     public function modifyById(Uuid $id, User $user)
     {
-        // TODO: Implement modifyById() method.
+        mysqli_query($this->connection,"UPDATE `test_user` SET `id`='".$user->getId()."',".
+            "`username`='".$user->getUsername()."',`firstName`='".$user->getFirstName()."',`lastName`='".$user->getLastName()."' WHERE `id` = '$id';");
+        if(mysqli_affected_rows($this->connection)>0){
+            return true;
+        }
+        return false;
     }
 
     public function removeById(Uuid $id)
     {
-        // TODO: Implement removeById() method.
+        mysqli_query($this->connection,"DELETE FROM `test_user` WHERE `id` = '$id';");
+        if(mysqli_affected_rows($this->connection)>0){
+            return true;
+        }
+        return false;
     }
 
     public function count()
     {
-        // TODO: Implement count() method.
+        $result = mysqli_query($this->connection,"SELECT COUNT(*) as `count` FROM `test_user`;");
+        if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
+        {
+            return (int)$row['count'];
+        }
+        return false;
     }
 }

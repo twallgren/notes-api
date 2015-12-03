@@ -8,19 +8,19 @@ class User
     /**
      * @var Uuid
      */
-    protected $id;
+    public $id;
     /**
      * @var StringLiteral
      */
-    protected $username;
+    public $username;
     /**
      * @var StringLiteral
      */
-    protected $firstName;
+    public $firstName;
     /**
      * @var StringLiteral
      */
-    protected $lastName;
+    public $lastName;
 
     /**
      * @param StringLiteral $username

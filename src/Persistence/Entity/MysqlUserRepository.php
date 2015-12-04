@@ -17,22 +17,22 @@ class MysqlUserRepository implements  UserRepositoryInterface
     protected $connection;
     public function __construct()
     {
-        $this->connection = mysqli_connect("localhost","taylor","password","testdb");
+        $this->connection = mysqli_connect("localhost","taylor","password","notes");
     }
 
     public function add(User $user)
     {
-        mysqli_query($this->connection,"INSERT INTO `test_user`(`id`, `username`, `firstName`, ".
+        mysqli_query($this->connection,"INSERT INTO `user`(`id`, `username`, `firstName`, ".
             "`lastName`) VALUES ('".$user->getId()."','".$user->getUsername()."','".$user->getFirstName()."','".$user->getLastName()."');");
     }
 
     public function getUsers()
     {
-        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `test_user`;");
+        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `user`;");
         $users=[];
         while($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
         {
-            $user = new User($row['id']);
+            $user = new User(new Uuid($row['id']));
             $user->setUsername($row['username']);
             $user->setFirstName($row['firstName']);
             $user->setLastName($row['lastName']);
@@ -45,12 +45,12 @@ class MysqlUserRepository implements  UserRepositoryInterface
     public function getByUsername($username)
     {
         $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` ".
-            "FROM `test_user` WHERE `username` = '".$username."';");
+            "FROM `user` WHERE `username` = '".$username."';");
         print_r("SELECT `id`, `username`, `firstName`, `lastName` ".
-            "FROM `test_user` WHERE `username` = '".$username."';");
+            "FROM `user` WHERE `username` = '".$username."';");
         if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
         {
-            $user = new User($row['id']);
+            $user = new User(new Uuid($row['id']));
             $user->setUsername($row['username']);
             $user->setFirstName($row['firstName']);
             $user->setLastName($row['lastName']);
@@ -61,10 +61,10 @@ class MysqlUserRepository implements  UserRepositoryInterface
 
     public function getById(Uuid $id)
     {
-        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `test_user` WHERE `id` = '$id';");
+        $result = mysqli_query($this->connection,"SELECT `id`, `username`, `firstName`, `lastName` FROM `user` WHERE `id` = '$id';");
         if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
         {
-            $user = new User($row['id']);
+            $user = new User(new Uuid($row['id']));
             $user->setUsername($row['username']);
             $user->setFirstName($row['firstName']);
             $user->setLastName($row['lastName']);
@@ -75,7 +75,7 @@ class MysqlUserRepository implements  UserRepositoryInterface
 
     public function modifyById(Uuid $id, User $user)
     {
-        mysqli_query($this->connection,"UPDATE `test_user` SET `id`='".$user->getId()."',".
+        mysqli_query($this->connection,"UPDATE `user` SET `id`='".$user->getId()."',".
             "`username`='".$user->getUsername()."',`firstName`='".$user->getFirstName()."',`lastName`='".$user->getLastName()."' WHERE `id` = '$id';");
         if(mysqli_affected_rows($this->connection)>0){
             return true;
@@ -85,7 +85,7 @@ class MysqlUserRepository implements  UserRepositoryInterface
 
     public function removeById(Uuid $id)
     {
-        mysqli_query($this->connection,"DELETE FROM `test_user` WHERE `id` = '$id';");
+        mysqli_query($this->connection,"DELETE FROM `user` WHERE `id` = '$id';");
         if(mysqli_affected_rows($this->connection)>0){
             return true;
         }
@@ -94,7 +94,7 @@ class MysqlUserRepository implements  UserRepositoryInterface
 
     public function count()
     {
-        $result = mysqli_query($this->connection,"SELECT COUNT(*) as `count` FROM `test_user`;");
+        $result = mysqli_query($this->connection,"SELECT COUNT(*) as `count` FROM `user`;");
         if($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
         {
             return (int)$row['count'];

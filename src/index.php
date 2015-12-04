@@ -28,10 +28,10 @@ $app->get('/users',function(){
 });
 
 $app->post('/users',function(Request $request) {
-    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+    //if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
         $data = json_decode($request->getContent(), true);
         $request->request->replace(is_array($data) ? $data : array());
-    }
+    //}
     $data = array(
         'username'  => $request->request->get('username'),
         'firstName'  => $request->request->get('firstName'),

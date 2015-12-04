@@ -5,7 +5,7 @@ use InvalidArgumentException;
 
 class StringLiteral
 {
-	protected $value;
+	public $value;
 	public function __construct($value = '')
 	{
 		if(!is_string($value))
@@ -14,7 +14,8 @@ class StringLiteral
 				__METHOD__ . '(): $value must be a string'
 			);
 		}
-		$this->value=$value;
+
+        $this->value=$value;
 	}
 	public function __toString()
 	{

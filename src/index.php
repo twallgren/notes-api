@@ -18,9 +18,25 @@ $app->get('/',function(){
     return new Response('<h1>REST API</h1>',200);
 });
 
-$app->get('/users',function(){
+$app->get('/users',function(Request $request){
     $repo = new \Notes\Persistence\Entity\MysqlUserRepository();
-    $jsons = json_encode($repo->getUsers());
+    $users = $repo->getUsers();
+    if(isset($request->query->all()['sort-username']))
+    {
+        if($request->query->all()['sort-username']==strtolower("asc"))
+        {
+            usort($users,function($a,$b) {
+                return ($a->getUsername() < $b->getUsername()) ? -1 : 1;
+            });
+        }
+        else if($request->query->all()['sort-username']==strtolower("desc"))
+        {
+            usort($users,function($a,$b) {
+                return ($a->getUsername() > $b->getUsername()) ? -1 : 1;
+            });
+        }
+    }
+    $jsons = json_encode($users);
     $response =  new Response($jsons,200);
     $response->headers->set('Content-Type','application/json');
     $response->headers->set('Content-Length',strlen($jsons));
@@ -56,7 +72,7 @@ $app->post('/users',function(Request $request) {
     }
     $repo->add($user);
     $jsons = json_encode([$user->getId()->__toString(),$user->getUsername(),$user->getFirstName(),$user->getLastName()]);
-    $response =  new Response($jsons,200);
+    $response =  new Response($jsons,201);
     $response->headers->set('Content-Type','application/json');
     $response->headers->set('Content-Length',strlen($jsons));
     return $response;
